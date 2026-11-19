@@ -1,0 +1,37 @@
+#include <Servo.h>
+
+Servo myservo;
+int analogpin = A0;
+int digitalpin = 2;
+float emgvalue = 0;
+float filteredvalue = 0;
+float alpha = 0.1; //a low multiplier value for low noise .5 for smoother .2 for quicker response
+//----------------------------
+int minthreshold = 100;   //change this after every test
+int maxthreshold = 250;
+//--------------------------
+
+void setup() {
+  myservo.attach(digitalpin);
+  myservo.write(0);
+  Serial.begin(9600);
+
+  
+}
+
+void loop() {
+  emgvalue = analogRead(analogpin);
+  filteredvalue = (alpha * emgvalue) + ((1.0 - alpha) * filteredvalue); //low pASS fillter
+  Serial.println(filteredvalue);
+  if (filteredvalue >= maxthreshold){
+    myservo.write(180);
+
+  }
+  else if (filteredvalue > minthreshold && filteredvalue < maxthreshold){
+    myservo.write(90);
+  }
+  else {
+    myservo.write(0);
+delay(10);
+    }
+}
